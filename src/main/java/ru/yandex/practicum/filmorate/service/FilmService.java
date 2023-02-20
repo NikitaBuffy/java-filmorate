@@ -22,7 +22,6 @@ public class FilmService {
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.parse("1895-12-28");
     int random = 0;
 
-    @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
