@@ -1,26 +1,28 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
+@Builder
 public class Film {
     private int id;
-    @NotBlank
+    @NotBlank(message = "Название не должно быть пустым")
     private final String name;
-    @Size(max=200)
+    @Size(max = 200, message = "Максимальная длина описания 200 символов.")
     private final String description;
     private final LocalDate releaseDate;
-    @PositiveOrZero
+    @PositiveOrZero(message = "Продолжительность фильма не может быть отрицательной")
     private final int duration;
-    private Set<Integer> likes = new HashSet<>();
+    private final MpaRating mpa;
+    private List<Genre> genres;
+    private Set<Integer> likes;
 
     public static final Comparator<Film> COMPARE_BY_LIKES = new Comparator<Film>() {
         @Override

@@ -3,15 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.FilmLikesDao;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -19,13 +18,15 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final FilmLikesDao filmLikesDao;
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.parse("1895-12-28");
     int random = 0;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, FilmLikesDao filmLikesDao) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.filmLikesDao = filmLikesDao;
     }
 
     public Film addFilm(Film film) {
@@ -47,26 +48,22 @@ public class FilmService {
         return filmStorage.getFilmById(id);
     }
 
-    public void addLike(int userId, int filmId) {
-        Film film = filmStorage.getFilmById(filmId);
-        User user = userStorage.getUserById(userId); // В этом методе заодно и валидируется наличие userId
-        film.getLikes().add(user.getId());
-        log.info("Пользователь с ID {} поставил лайк фильму {}", userId, filmId);
+    public void addLike(int filmId, int userId) {
+        filmStorage.getFilmById(filmId);
+        userStorage.getUserById(userId);
+
+        filmLikesDao.addLike(filmId, userId);
     }
 
-    public void deleteLike(int userId, int filmId) {
-        Film film = filmStorage.getFilmById(filmId);
-        User user = userStorage.getUserById(userId); // В этом методе заодно и валидируется наличие userId
-        film.getLikes().remove(user.getId());
-        log.info("Пользователь с ID {} убрал лайк с фильма {}", userId, filmId);
+    public void deleteLike(int filmId, int userId) {
+        filmStorage.getFilmById(filmId);
+        userStorage.getUserById(userId);
+
+        filmLikesDao.deleteLike(filmId, userId);
     }
 
     public List<Film> getTopRatedFilms(Integer count) {
-        List<Film> films = filmStorage.getFilms();
-        return films.stream()
-                .sorted(Collections.reverseOrder(Film.COMPARE_BY_LIKES))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getTopRatedFilms(count);
     }
 
     private void validate(Film film) {
