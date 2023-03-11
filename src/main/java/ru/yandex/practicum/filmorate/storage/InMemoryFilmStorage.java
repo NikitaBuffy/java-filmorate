@@ -6,10 +6,8 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -53,5 +51,14 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.warn("Не найден фильм при поиске по ID.");
             throw new FilmNotFoundException("Фильм с ID: " + id + " не существует.");
         }
+    }
+
+    @Override
+    public List<Film> getTopRatedFilms(Integer count) {
+        List<Film> films = getFilms();
+        return films.stream()
+                .sorted(Collections.reverseOrder(Film.COMPARE_BY_LIKES))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 }

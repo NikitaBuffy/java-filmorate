@@ -24,30 +24,10 @@ FROM users;
 
 ```sql
 --Выборка ТОП-5 наиболее популярных фильмов по лайкам
-SELECT name,
-       COUNT(*) AS likes_count
-FROM films
-JOIN film_likes ON films.film_id = film_likes.film_id
-GROUP BY films.film_id
-ORDER BY likes_count DESC
-LIMIT 5;
+SELECT * 
+FROM films f 
+LEFT JOIN film_likes fl ON f.film_id = fl.film_id 
+GROUP BY f.film_id 
+ORDER BY COUNT(fl.user_id) DESC 
+LIMIT 10;
 ```
-
-```sql
-SELECT name
-FROM users as u
-JOIN friends f ON u.user_id = f.user_id1
-WHERE f.user_id2 = 2
-  AND f.status = TRUE
-  AND EXISTS
-    (SELECT 1
-     FROM friends as f2
-     WHERE f2.user_id1 = 1
-       AND f2.user_id2 = f.user_id2
-       AND f2.status = TRUE )
-ORDER BY name;
-```
-
-Последний запрос выберет имена всех друзей, которые есть у пользователя с ID 2 и которые также являются друзьями пользователя с ID 1. Результат будет отсортирован по именам пользователей в алфавитном порядке.
-Чтобы оптимизировать производительность, можно использовать оператор EXISTS с фиктивным столбцом 1 **(SELECT 1)** в подзапросе, вместо выборки реальных столбцов. Это позволяет избежать чтения и выборки всех строк из таблицы, которая не нужна для определения наличия строк, удовлетворяющих условию.
-

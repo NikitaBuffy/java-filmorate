@@ -9,26 +9,19 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
     private int id;
-    @Email
-    @NotBlank
+    @Email(message = "Неверный email. Убедитесь, что формат соответствует email.")
+    @NotBlank(message = "Email не должен содержать пробелы или быть пустым")
     private String email;
-    @NotBlank
+    @NotBlank(message = "Логин не должен содержать пробелы или быть пустым")
     private String login;
     private String name;
-    @Past
+    @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
     private Set<Integer> friends = new HashSet<>();
-
-    public User(String email, String login, String name, LocalDate birthday) {
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }
 }
